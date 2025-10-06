@@ -135,7 +135,7 @@ with tab1:
         local_times, vals = plot_time_series(times, temps_c, "Temperature (°C)", color="red")
         st.info("ℹ️ Temperature is at **2 m AGL** and displayed in **°C**.")
         if vals:
-            st.success(f"Current Forecast: {vals[-1]:.1f} °C at {local_times[-1]}")
+            st.success(f"Current Forecast: {vals[0]:.1f} °C at {local_times[0]}")
 
 with tab2:
     st.subheader("Humidity Forecast")
@@ -146,7 +146,7 @@ with tab2:
         local_times, vals = plot_time_series(times, hums, "Relative Humidity (%)", color="blue")
         st.info("ℹ️ Humidity is at **2 m AGL** and displayed in **%**.")
         if vals:
-            st.success(f"Current Forecast: {vals[-1]:.0f}% at {local_times[-1]}")
+            st.success(f"Current Forecast: {vals[0]:.0f}% at {local_times[0]}")
 
 with tab3:
     st.subheader("Precipitation Forecast")
@@ -158,7 +158,7 @@ with tab3:
         local_times, vals = plot_time_series(times, vals_mm, "Precipitation (mm)", color="green")
         st.info("ℹ️ Precipitation is shown as **total precipitation in millimetres (mm)**.")
         if vals:
-            st.success(f"Current Forecast: {vals[-1]:.1f} mm at {local_times[-1]}")
+            st.success(f"Current Forecast: {vals[0]:.1f} mm at {local_times[0]}")
 
 with tab4:
     st.subheader("Wind Forecast (100 m AGL)")
@@ -182,13 +182,13 @@ with tab4:
                 "and directions following the **meteorological convention** (0° = North).")
 
         if vals and dirs:
-            last_dir = dirs[-1]
-            compass_label = deg_to_compass(last_dir)
+            current_dir = dirs[0]
+            compass_label = deg_to_compass(current_dir)
             fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
             ax.set_theta_zero_location("N")
             ax.set_theta_direction(-1)
-            ax.arrow(math.radians(last_dir), 0, 0, 1,
+            ax.arrow(math.radians(current_dir), 0, 0, 1,
                      width=0.03, color='b', alpha=0.8, length_includes_head=True)
-            ax.set_title(f"Current Wind Direction: {last_dir:.0f}° ({compass_label})", va='bottom')
+            ax.set_title(f"Current Wind Direction: {current_dir:.0f}° ({compass_label})", va='bottom')
             st.pyplot(fig)
-            st.success(f"Current Forecast: {vals[-1]:.1f} kt from {last_dir:.0f}° ({compass_label}) at {local_times[-1]}")
+            st.success(f"Current Forecast: {vals[0]:.1f} kt from {current_dir:.0f}° ({compass_label}) at {local_times[0]}")
