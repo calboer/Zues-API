@@ -168,27 +168,30 @@ with tab4:
     v = fetch_forecast(api_key, lat, lon, v_var, hours)
     if u and v:
         times = u["hourly"].get("time", [])
-        u_vals = u["hourly"].get(u_var, [])
-        v_vals = v["hourly"].get(v_var, [])
+        u_vals = u.get("hourly", {}).get(u_var, [])
+        v_vals = v.get("hourly", {}).get(v_var, [])
 
-        speeds, dirs = [], []
-        for uu, vv in zip(u_vals, v_vals):
-            speed, d = wind_speed_direction(uu, vv)
-            speeds.append(speed)
-            dirs.append(d)
+        if not u_vals or not v_vals:
+            st.warning("⚠️ Wind data unavailable or incomplete for this location/time.")
+        else:
+            speeds, dirs = [], []
+            for uu, vv in zip(u_vals, v_vals):
+                speed, d = wind_speed_direction(uu, vv)
+                speeds.append(speed)
+                dirs.append(d)
 
-        local_times, vals = plot_time_series(times, speeds, "Wind Speed (kt)", color="purple")
-        st.info("ℹ️ Wind is shown at **100 m AGL**, with speeds in **knots (kt)** "
-                "and directions following the **meteorological convention** (0° = North).")
+            local_times, vals = plot_time_series(times, speeds, "Wind Speed (kt)", color="purple")
+            st.info("ℹ️ Wind is shown at **100 m AGL**, with speeds in **knots (kt)** "
+                    "and directions following the **meteorological convention** (0° = North).")
 
-        if vals and dirs:
-            current_dir = dirs[0]
-            compass_label = deg_to_compass(current_dir)
-            fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-            ax.set_theta_zero_location("N")
-            ax.set_theta_direction(-1)
-            ax.arrow(math.radians(current_dir), 0, 0, 1,
-                     width=0.03, color='b', alpha=0.8, length_includes_head=True)
-            ax.set_title(f"Current Wind Direction: {current_dir:.0f}° ({compass_label})", va='bottom')
-            st.pyplot(fig)
-            st.success(f"Current Forecast: {vals[0]:.1f} kt from {current_dir:.0f}° ({compass_label}) at {local_times[0]}")
+            if vals and dirs:
+                current_dir = dirs[0]
+                compass_label = deg_to_compass(current_dir)
+                fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+                ax.set_theta_zero_location("N")
+                ax.set_theta_direction(-1)
+                ax.arrow(math.radians(current_dir), 0, 0, 1,
+                         width=0.03, color='b', alpha=0.8, length_includes_head=True)
+                ax.set_title(f"Current Wind Direction: {current_dir:.0f}° ({compass_label})", va='bottom')
+                st.pyplot(fig)
+                st.success(f"Current Forecast: {vals[0]:.1f} kt from {current_dir:.0f}° ({compass_label}) at {local_times[0]}")
